@@ -122,7 +122,7 @@
       </PermittivityData>
       <ConductivityData>
          <AbsoluteConductivityData>
-            <rVal temperature="20">22.2144</rVal>
+            <rVal temperature="20">0</rVal>
          </AbsoluteConductivityData>
       </ConductivityData>
       <ThermalConductivityData>
