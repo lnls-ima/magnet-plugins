@@ -19,10 +19,13 @@ Sub Install_Plugins()
   PluginsDir = objFSO.BuildPath(ScriptPath, "LNLS_plugins")
   PluginsInstallationDir = objFSO.BuildPath(ExecDir, "LNLS_plugins")
 
+  Const DeleteReadOnly = True
+
   On Error Resume Next
+  objFSO.DeleteFile(objFSO.BuildPath(PluginsInstallationDir, "*.vbs")), DeleteReadOnly
   objFSO.CopyFolder PluginsDir, PluginsInstallationDir
   If (Err.Number = 70) Then
-		MsgBox( "To install LNLS plugins launch a MagNet application in administrator mode." )
+		MsgBox( "To install LNLS plugins launch MagNet in administrator mode." )
 		Exit Sub
   End If
   On Error GoTo 0
