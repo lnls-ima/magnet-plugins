@@ -1,9 +1,27 @@
 
 Call VertexParametrization()
 
+
 Sub VertexParametrization()
 
-  n = getDocument().getView().getSelection().getNumberOfObjects()
+  Set selection = getDocument().getView().getSelection()
+  nobj = selection.getNumberOfObjects()
+
+  If nobj = 0 Then
+    MsgBox("No vertex selected.")
+    Exit Sub
+  End If
+
+  Dim ids
+  ReDim ids(nobj)
+  n = 0
+  For i=0 to nobj-1
+    If (selection.getObjectType(i) = infoVertex) Then
+      ids(n) = selection.getObjectID(i)(0)
+      n = n + 1
+    End If
+  Next
+  ReDim Preserve ids(n)
 
   If n = 0 Then
     MsgBox("No vertex selected.")
@@ -21,13 +39,6 @@ Sub VertexParametrization()
     MsgBox("Invalid shape.")
     Exit Sub
   End If
-
-  Dim ids
-  ReDim ids(n)
-
-  For i=0 to n-1
-    ids(i) = getDocument().getView().getSelection().getObjectID(i)(0)
-  Next
 
   Call getDocument().beginUndoGroup("Vertex Parametrization")
 

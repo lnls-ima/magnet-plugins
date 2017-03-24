@@ -58,14 +58,14 @@ Sub Install_Plugins()
   Dim DrawShapePath
   Dim VertexParamPath
   Dim FieldSamplerPath
-  Dim NormalMultipolesPath
-  Dim SkewMultipolesPath
+  Dim FieldMultipolesPath
+  Dim CoilResistancePath
 
   DrawShapePath = objFSO.BuildPath(PluginsInstallationDir, "draw_shape.vbs")
   VertexParamPath = objFSO.BuildPath(PluginsInstallationDir, "vertex_parametrization.vbs")
   FieldSamplerPath = objFSO.BuildPath(PluginsInstallationDir, "field_sampler.vbs")
-  NormalMultipolesPath = objFSO.BuildPath(PluginsInstallationDir, "normal_multipoles.vbs")
-  SkewMultipolesPath = objFSO.BuildPath(PluginsInstallationDir, "skew_multipoles.vbs")
+  FieldMultipolesPath = objFSO.BuildPath(PluginsInstallationDir, "field_multipoles.vbs")
+  CoilResistancePath = objFSO.BuildPath(PluginsInstallationDir, "coil_resistance.vbs")
 
   Set objFile = objFSO.OpenTextFile(EventHandlersFilename, 1)
   FileContent = objFile.ReadAll
@@ -88,10 +88,10 @@ Sub Install_Plugins()
               Chr(9) & "macromenu.appendItem ""Vertex Parametrization"", command" & vbCrLf & vbCrLf & _
               Chr(9) & "command = ""runScript("" & Chr(34) & """ & FieldSamplerPath & """ & Chr(34) & "")""" & vbCrLf & _
               Chr(9) & "macromenu.appendItem ""Field Sampler"", command" & vbCrLf & vbCrLf & _
-              Chr(9) & "command = ""runScript("" & Chr(34) & """ & NormalMultipolesPath & """ & Chr(34) & "")""" & vbCrLf & _
-              Chr(9) & "macromenu.appendItem ""Normal Multipoles"", command" & vbCrLf & vbCrLf & _
-              Chr(9) & "command = ""runScript("" & Chr(34) & """ & SkewMultipolesPath & """ & Chr(34) & "")""" & vbCrLf & _
-              Chr(9) & "macromenu.appendItem ""Skew Multipoles"", command" & vbCrLf & _
+              Chr(9) & "command = ""runScript("" & Chr(34) & """ & FieldMultipolesPath & """ & Chr(34) & "")""" & vbCrLf & _
+              Chr(9) & "macromenu.appendItem ""Field Multipoles"", command" & vbCrLf & vbCrLf & _
+              Chr(9) & "command = ""runScript("" & Chr(34) & """ & CoilResistancePath & """ & Chr(34) & "")""" & vbCrLf & _
+              Chr(9) & "macromenu.appendItem ""Coil Resistance"", command" & vbCrLf & _
               Chr(9) & "'================================================================================================='" & vbCrLf & _
               Chr(9) & "'LNLS Plugins End'"
 
