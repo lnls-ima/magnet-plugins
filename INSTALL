@@ -7,6 +7,6 @@ Requirements
 Installation
 ============
 
-- Lanch a MagNet application in administrator mode
+- Launch a MagNet application in administrator mode
 - Run the script install_plugins.vbs
 - Restart MagNet and check if the LNLS menu and the list of LNLS materials are available
