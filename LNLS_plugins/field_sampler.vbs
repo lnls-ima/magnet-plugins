@@ -65,21 +65,21 @@ Sub FieldSampler()
 	Dim BoxTitle
 	BoxTitle = "Field sampling - Problem " & CStr( nproblem )
 
-	Range = GetVariableRange("X", BoxTitle, "0 10 1", XRange_FromFile)
+	Range = GetVariableRange("X coordinate (mm)", BoxTitle, "0 10 1", XRange_FromFile)
 	If isNull(Range) Then Exit Sub End If
 	xmin    = Range(0)
 	xmax    = Range(1)
 	xpoints = Range(2)
 	xstep   = Range(3)
 
-	Range = GetVariableRange("Y", BoxTitle, "0 10 1", YRange_FromFile)
+	Range = GetVariableRange("Y coordinate (mm)", BoxTitle, "0 10 1", YRange_FromFile)
 	If isNull(Range) Then Exit Sub End If
 	ymin    = Range(0)
 	ymax    = Range(1)
 	ypoints = Range(2)
 	ystep   = Range(3)
 
-	Range = GetVariableRange("Z", BoxTitle, "0 10 1", ZRange_FromFile)
+	Range = GetVariableRange("Z coordinate (mm)", BoxTitle, "0 10 1", ZRange_FromFile)
 	If isNull(Range) Then Exit Sub End If
 	zmin    = Range(0)
 	zmax    = Range(1)

@@ -102,7 +102,7 @@ Function GetVariableRange(VariableLabel, DialogTitle, DefaultValues, FromFile)
   If FromFile <> "" Then
 		UserInput = FromFile
 	Else
-		UserInput = InputBox( VariableLabel & " coordinate (mm)" & vbLf & "Start, end, iterations", DialogTitle, DefaultValues)
+		UserInput = InputBox( VariableLabel & vbLf & "Start, end, iterations", DialogTitle, DefaultValues)
 	End If
 
 	If (Len( UserInput ) = 0) Then
@@ -139,7 +139,7 @@ Function GetVariableValue(VariableLabel, DialogTitle, DefaultValue, FromFile)
 	If FromFile <> "" Then
 		UserInput = FromFile
 	Else
-		UserInput = InputBox(VariableLabel + " coordinate (mm)", DialogTitle, DefaultValue)
+		UserInput = InputBox(VariableLabel, DialogTitle, DefaultValue)
 	End If
 
 	If (Len( UserInput ) = 0) Then

@@ -37,14 +37,14 @@ Sub FieldMultipoles()
 	nproblem = GetProblemNumber(Doc, "Field Multipoles")
 	If isNull(nproblem) Then Exit Sub End If
 
-	Range = GetVariableRange("X", "Field Multipoles", "-10, 10, 101", XRange_FromFile)
+	Range = GetVariableRange("X coordinate (mm)", "Field Multipoles", "-10, 10, 101", XRange_FromFile)
 	If isNull(Range) Then Exit Sub End If
 	xmin    = Range(0)
 	xmax    = Range(1)
 	xpoints = Range(2)
 	xstep   = Range(3)
 
-	z = GetVariableValue("Z", "Field Multipoles", "0", Z_FromFile)
+	z = GetVariableValue("Z coordinate (mm)", "Field Multipoles", "0", Z_FromFile)
 	If isNull(z) Then Exit Sub End If
 
 	FittingOrder = GetVariableValue("Fitting Order", "Field Multipoles", "15", FittingOrder_FromFile)
