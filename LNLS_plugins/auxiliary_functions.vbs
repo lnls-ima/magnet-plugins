@@ -1,4 +1,58 @@
 
+Const electron_rest_energy = 510998.92811 '[eV]
+Const light_speed  = 299792458 '[m/s]
+
+
+Function CalcBeta(ByVal energy)
+  CalcBeta = Sqr( 1.0 - (1.0 / ((energy / electron_rest_energy)^2)) )
+End Function
+
+
+Function CalcBrho(ByVal energy, ByVal beta)
+  CalcBrho = (beta * energy / light_speed)
+End Function
+
+
+Function ScientificNotation(floVal, NumberofDigits)
+  Dim floAbsVal, intSgnVal, intScale, floScaled, floStr
+
+  If Not isNumeric(floVal) Then
+    ScientificNotation = ""
+    Exit Function
+  End If
+
+  floAbsVal = Abs(floVal)
+  If floAbsVal <> 0 Then
+    intSgnVal = Sgn(floVal)
+    intScale = Int(Log(floAbsVal) / Log(10))
+    floScaled = floAbsVal / (10 ^ intScale)
+
+		If intSgnVal < 0 Then
+			floStr = FormatNumber(intSgnVal * floScaled, NumberofDigits)
+		Else
+			floStr = "+" & FormatNumber(intSgnVal * floScaled, NumberofDigits)
+		End If
+
+    If Sgn(intScale) < 0 Then
+      If Len(CStr(intScale)) = 2 Then
+			   ScientificNotation = floStr & "e-0" & CStr(Abs(intSCale))
+      Else
+        ScientificNotation = floStr & "e-" & CStr(Abs(intSCale))
+      End If
+    Else
+      If Len(CStr(intScale)) = 1 Then
+        ScientificNotation = floStr & "e+0" & CStr(intSCale)
+      Else
+        ScientificNotation = floStr & "e+" & CStr(intSCale)
+      End If
+    End If
+  Else
+    ScientificNotation = "+" & FormatNumber(0, NumberofDigits) & "e+00"
+  End If
+
+End Function
+
+
 Function getDocumentPath(Doc)
 
 	If (Len( Doc.getFilePath()) <> 0) Then
@@ -247,6 +301,22 @@ Function GetDate()
 	date_str = year_str & "-" & month_str & "-" & day_str
 
 	GetDate = date_str
+
+End Function
+
+
+Function NewtonLorentzEquation(ByVal alpha, ByVal r, ByVal b)
+
+  Dim drds(6)
+
+  drds(0) = r(3)
+  drds(1) = r(4)
+  drds(2) = r(5)
+  drds(3) = -alpha * (r(4) * b(2) - r(5) * b(1))
+  drds(4) = -alpha * (r(5) * b(0) - r(3) * b(2))
+  drds(5) = -alpha * (r(3) * b(1) - r(4) * b(0))
+
+  NewtonLorentzEquation = drds
 
 End Function
 

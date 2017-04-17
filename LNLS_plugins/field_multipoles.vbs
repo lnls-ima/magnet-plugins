@@ -130,8 +130,8 @@ Sub WriteMultipolesFile(FullFilename, nproblems, normal_coeffs, skew_coeffs)
 	For i = 0 To Ubound(normal_coeffs, 1)
 		TempStr = CStr(i) & vbTab
 		For j = 0 To Ubound(normal_coeffs, 2)
-			TempStr = TempStr & ScientificNotation(normal_coeffs(i, j), nd, False) & vbTab
-			TempStr = TempStr & ScientificNotation(skew_coeffs(i, j), nd, False) & vbTab
+			TempStr = TempStr & MScientificNotation(normal_coeffs(i, j), nd, False) & vbTab
+			TempStr = TempStr & MScientificNotation(skew_coeffs(i, j), nd, False) & vbTab
 		Next
 		objFile.Write TempStr & vbCrLf
 	Next
@@ -176,20 +176,20 @@ Sub OpenMultipolesDialog(Filename, nproblems, normal_coeffs, skew_coeffs)
 
 		MsgBox("Problem " & nproblems(0) & vbTab & vbTab & "Normal" & vbTab & vbTab & "Skew" & _
 		vbCrLf & vbCrLf & "Dipole" & vbTab & _
-		vbTab & ScientificNotation(nc(0), nd, True) & _
-		vbTab & ScientificNotation(sc(0), nd, True) & _
+		vbTab & MScientificNotation(nc(0), nd, True) & _
+		vbTab & MScientificNotation(sc(0), nd, True) & _
 	  vbCrLf & vbCrLf & "Quadrupole" & _
-		vbTab & ScientificNotation(nc(1), nd, True) & _
-		vbTab & ScientificNotation(sc(1), nd, True) & _
+		vbTab & MScientificNotation(nc(1), nd, True) & _
+		vbTab & MScientificNotation(sc(1), nd, True) & _
 	  vbCrLf & vbCrLf & "Sextupole" & vbTab & _
-		vbTab & ScientificNotation(nc(2), nd, True) & _
-		vbTab & ScientificNotation(sc(2), nd, True) & _
+		vbTab & MScientificNotation(nc(2), nd, True) & _
+		vbTab & MScientificNotation(sc(2), nd, True) & _
 	  vbCrLf & vbCrLf & "Octupole" & vbTab & _
-		vbTab & ScientificNotation(nc(3), nd, True) & _
-		vbTab & ScientificNotation(sc(3), nd, True) & _
+		vbTab & MScientificNotation(nc(3), nd, True) & _
+		vbTab & MScientificNotation(sc(3), nd, True) & _
 	  vbCrLf & vbCrLf & "Decapole" & vbTab & _
-		vbTab & ScientificNotation(nc(4), nd, True) & _
-		vbTab & ScientificNotation(sc(4), nd, True) & _
+		vbTab & MScientificNotation(nc(4), nd, True) & _
+		vbTab & MScientificNotation(sc(4), nd, True) & _
 		vbCrLf & vbCrLf & "Multipoles table save in file: " & vbCrLf & Filename)
 
 	Else
@@ -199,11 +199,11 @@ Sub OpenMultipolesDialog(Filename, nproblems, normal_coeffs, skew_coeffs)
 End Sub
 
 
-Function ScientificNotation(floVal, NumberofDigits, AddSpace)
+Function MScientificNotation(floVal, NumberofDigits, AddSpace)
   Dim floAbsVal, intSgnVal, intScale, floScaled, floStr
 
   If Not isNumeric(floVal) Then
-    ScientificNotation = ""
+    MScientificNotation = ""
     Exit Function
   End If
 
@@ -221,15 +221,15 @@ Function ScientificNotation(floVal, NumberofDigits, AddSpace)
 
     If Sgn(intScale) < 0 Then
 			If AddSpace Then
-      	ScientificNotation = " " & floStr & "e" & CStr(intSCale)
+      	MScientificNotation = " " & floStr & "e" & CStr(intSCale)
 			Else
-				ScientificNotation = floStr & "e" & CStr(intSCale)
+				MScientificNotation = floStr & "e" & CStr(intSCale)
 			End If
     Else
-      ScientificNotation = floStr & "e+" & CStr(intSCale)
+      MScientificNotation = floStr & "e+" & CStr(intSCale)
     End If
   Else
-    ScientificNotation = "+" & FormatNumber(0, NumberofDigits) & "e+0"
+    MScientificNotation = "+" & FormatNumber(0, NumberofDigits) & "e+0"
   End If
 
 End Function

@@ -1,7 +1,7 @@
 Import("auxiliary_functions.vbs")
 
 Const CommentChar = "#"
-Const ParametersFilename  = "field_sampler_parameters.txt"
+Const ParametersFilename  = "field_sampler_inputs.txt"
 Dim EmptyVar
 
 Call FieldSampler()
@@ -100,6 +100,14 @@ Sub FieldSampler()
 
 	DefaultName = DefaultName & ".txt"
 
+	SplitName = Split( DefaultName, "_")
+	MagnetName = SplitName(1)
+	If (Ubound(SplitName) > 1) Then
+		Model = SplitName(2)
+	Else
+		Model = ""
+	End If
+
 	Filename = GetVariableString("Enter the file name:", BoxTitle, DefaultName, EmptyVar)
 	If isNull(Filename) Then Exit Sub End If
 
@@ -112,49 +120,49 @@ Sub FieldSampler()
 	Set Field2 = Doc.getSolution.getSystemField (Mesh,"B y")
 	Set Field3 = Doc.getSolution.getSystemField (Mesh,"B z")
 
-	objFile.Write "fieldmap_name:       " & vbCrlf
-	objFile.Write "timestamp:           " & GetDate() & "_" & GetTime() & vbCrlf
-	objFile.Write "filename:      			" & Filename & vbCrlf
-	objFile.Write "nr_magnets:       		" & CStr( 1 ) & vbCrlf
+	objFile.Write "fieldmap_name:" & vbTab & vbTab & MagnetName & " " & Model & vbCrlf
+	objFile.Write "timestamp:" & vbTab & vbTab & GetDate() & "_" & GetTime() & vbCrlf
+	objFile.Write "filename:" & vbTab & vbTab & Filename & vbCrlf
+	objFile.Write "nr_magnets:" & vbTab & vbTab & CStr( 1 ) & vbCrlf
 	objFile.Write vbCrlf
-	objFile.Write "magnet_name:         " & vbCrlf
-	objFile.Write "gap[mm]:             " & vbCrlf
-	objFile.Write "control_gap[mm]:     " & vbCrlf
-	objFile.Write "magnet_length[mm]:   " & vbCrlf
+	objFile.Write "magnet_name:" & vbTab & vbTab & MagnetName & vbCrlf
+	objFile.Write "gap[mm]:" & vbTab & vbTab & vbCrlf
+	objFile.Write "control_gap[mm]:" & vbTab & "--" & vbCrlf
+	objFile.Write "magnet_length[mm]:" & vbTab  & vbCrlf
 
 	If not IsEmpty( MainCoilCurrent ) Then
-		objFile.Write "current_main[A]:     " & CStr( MainCoilCurrent ) & vbCrlf
-		objFile.Write "NI_main[A.esp]:      " & CStr( MainCoilCurrent*MainCoilTurns) & vbCrlf
+		objFile.Write "current_main[A]:" & vbTab & CStr( MainCoilCurrent ) & vbCrlf
+		objFile.Write "NI_main[A.esp]:" & vbTab & vbTab & CStr( MainCoilCurrent*MainCoilTurns) & vbCrlf
 	Else
-		objFile.Write "current_main[A]:     " & vbCrlf
-		objFile.Write "NI_main[A.esp]:      " & vbCrlf
+		objFile.Write "current_main[A]:" & vbTab & vbCrlf
+		objFile.Write "NI_main[A.esp]:" & vbTab & vbTab & vbCrlf
 	End If
 
 	If not IsEmpty( TrimCoilCurrent ) Then
-		objFile.Write "current_trim[A]:     " & CStr( TrimCoilCurrent ) & vbCrlf
-		objFile.Write "NI_trim[A.esp]:      " & CStr( TrimCoilCurrent*TrimCoilTurns) & vbCrlf
+		objFile.Write "current_trim[A]:" & vbTab & CStr( TrimCoilCurrent ) & vbCrlf
+		objFile.Write "NI_trim[A.esp]:" & vbTab & vbTab & CStr( TrimCoilCurrent*TrimCoilTurns) & vbCrlf
 	End If
 
 	If not IsEmpty( CHCoilCurrent ) Then
-		objFile.Write "current_ch[A]:       " & CStr( CHCoilCurrent ) & vbCrlf
-		objFile.Write "NI_ch[A.esp]:        " & CStr( CHCoilCurrent*CHCoilTurns ) & vbCrlf
+		objFile.Write "current_ch[A]:" & vbTab & vbTab & CStr( CHCoilCurrent ) & vbCrlf
+		objFile.Write "NI_ch[A.esp]:" & vbTab & vbTab & CStr( CHCoilCurrent*CHCoilTurns ) & vbCrlf
 	End If
 
 	If not IsEmpty( CVCoilCurrent ) Then
-		objFile.Write "current_cv[A]:       " & CStr( CVCoilCurrent ) & vbCrlf
-		objFile.Write "NI_cv[A.esp]:        " & CStr( CVCoilCurrent*CVCoilTurns ) & vbCrlf
+		objFile.Write "current_cv[A]:" & vbTab & vbTab & CStr( CVCoilCurrent ) & vbCrlf
+		objFile.Write "NI_cv[A.esp]:" & vbTab & vbTab & CStr( CVCoilCurrent*CVCoilTurns ) & vbCrlf
 	End If
 
 	If not IsEmpty( QSCoilCurrent ) Then
-		objFile.Write "current_qs[A]:       " & CStr( QSCoilCurrent ) & vbCrlf
-		objFile.Write "NI_qs[A.esp]:        " & CStr( QSCoilCurrent*QSCoilTurns ) & vbCrlf
+		objFile.Write "current_qs[A]:" & vbTab & vbTab & CStr( QSCoilCurrent ) & vbCrlf
+		objFile.Write "NI_qs[A.esp]:" & vbTab & vbTab & CStr( QSCoilCurrent*QSCoilTurns ) & vbCrlf
 	End If
 
-	objFile.Write "center_pos_z[mm]: 		" & CStr( 0 ) & vbCrlf
-	objFile.Write "center_pos_x[mm]: 		" & CStr( 0 ) & vbCrlf
-	objFile.Write "rotation[deg]:       " & CStr( 0 ) & vbCrlf
+	objFile.Write "center_pos_z[mm]:" & vbTab & CStr( 0 ) & vbCrlf
+	objFile.Write "center_pos_x[mm]:" & vbTab & CStr( 0 ) & vbCrlf
+	objFile.Write "rotation[deg]:" & vbTab & vbTab & CStr( 0 ) & vbCrlf
 	objFile.Write vbCrlf
-	objFile.Write "X[mm]		Y[mm]		Z[mm]		B x, B y, B z   (T)" & vbCrlf
+	objFile.Write "X[mm]" & vbTab & vbTab & "Y[mm]" & vbTab & vbTab & "Z[mm]" & vbTab & vbTab & "Bx" & vbTab & vbTab & "By" & vbTab & vbTab & "Bz [T]" & vbCrlf
 	objFile.Write "------------------------------------------------------------------------------------------------------------------------------------------------------------------" & vbCrlf
 
 	For k=0 to zpoints-1
