@@ -148,6 +148,7 @@ Function GetVariableRange(VariableLabel, DialogTitle, DefaultValues, FromFile)
   Dim UserInput
   Dim MinValue
   Dim MaxValue
+  Dim TempValue
   Dim Nrpts
   Dim VariableStep
   Dim Range
@@ -168,6 +169,12 @@ Function GetVariableRange(VariableLabel, DialogTitle, DefaultValues, FromFile)
 	MinValue = CDbl(UserInput(0))
 	MaxValue = CDbl(UserInput(1))
 	Nrpts = CDbl(UserInput(2))
+
+  If MinValue > MaxValue Then
+    TempValue = MinValue
+    MinValue = MaxValue
+    MaxValue = MinValue
+  End If
 
 	If (Nrpts <> 1) Then
 		VariableStep = (MaxValue-MinValue) / (Nrpts-1)

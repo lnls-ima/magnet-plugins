@@ -48,10 +48,8 @@ Sub KickMap()
   Dim Range
   Dim xmin, xmax, xpoints, xstep
   Dim ymin, ymax, ypoints, ystep
-  Dim zmin, zmax, length
+  Dim zmin, zmax, ztemp, length
   Dim energy
-
-  Call Doc.getSolution.getProblem(nproblem).getGeometricExtents("", lim_xmin, lim_ymin, lim_zmin, lim_xmax, lim_ymax, lim_zmax)
 
   energy = GetVariableValue("Particle energy (GeV)", "Kick Map", "3", EmptyVar)
   If isNull(energy) Then Exit Sub End If
@@ -71,11 +69,53 @@ Sub KickMap()
 	ypoints = Range(2)
   ystep   = Range(3)
 
-  zmin = GetVariableValue("Initial Z (mm)", "Kick Map", CStr(lim_zmin), EmptyVar)
+  zmin = GetVariableValue("Initial Z (mm)", "Kick Map", "0", EmptyVar)
   If isNull(zmin) Then Exit Sub End If
 
-  zmax = GetVariableValue("Final Z (mm)", "Kick Map", CStr(lim_zmax), EmptyVar)
+  zmax = GetVariableValue("Final Z (mm)", "Kick Map", "500", EmptyVar)
   If isNull(zmax) Then Exit Sub End If
+
+  MsgBox("The kick map calculation may take several minutes." & vbCrlf & "The application will be locked until it is finished.")
+
+  If zmin > zmax Then
+    ztemp = zmin
+    zmin = zmax
+    zmax = ztemp
+  End If
+
+  Set Mesh = Doc.getSolution.getMesh(nproblem)
+
+  Call Mesh.getGeometricExtents(lim_xmin, lim_ymin, lim_zmin, lim_xmax, lim_ymax, lim_zmax)
+
+  If xmin < lim_xmin Then
+    MsgBox("Initial X is out of the field matrix.")
+    Exit Sub
+  End If
+
+  If xmax > lim_xmax Then
+    MsgBox("Final X is out of the field matrix.")
+    Exit Sub
+  End If
+
+  If ymin < lim_ymin Then
+    MsgBox("Initial Y is out of the field matrix.")
+    Exit Sub
+  End If
+
+  If ymax > lim_ymax Then
+    MsgBox("Final Y is out of the field matrix.")
+    Exit Sub
+  End If
+
+  If zmin < lim_zmin Then
+    MsgBox("Initial Z is out of the field matrix.")
+    Exit Sub
+  End If
+
+  If zmax > lim_zmax Then
+    MsgBox("Final Z is out of the field matrix.")
+    Exit Sub
+  End If
 
   xmin   = xmin/1000
 	xmax   = xmax/1000
@@ -90,7 +130,6 @@ Sub KickMap()
 
   out_of_lim = False
 
-  Set Mesh = Doc.getSolution.getMesh(nproblem)
   Set Fieldx = Doc.getSolution.getSystemField(Mesh,"B x")
   Set Fieldy = Doc.getSolution.getSystemField(Mesh,"B y")
   Set Fieldz = Doc.getSolution.getSystemField(Mesh,"B z")
@@ -115,15 +154,6 @@ Sub KickMap()
   r(0) = 0 : r(1) = 0 : r(2) = zmin
   r(3) = 0 : r(4) = 0 : r(5) = 1
 
-  Set Window = CreateStatusWindow()
-  Window.document.write "<html><body bgcolor=buttonface>Calculating particle trajectories: <span id='output'></span> %</body></html>"
-  Window.document.title = "Kick Map"
-  Window.resizeto 320, 120
-  Window.moveto 200, 200
-  UpdateStatusBar(0)
-
-  Dim count, frac
-  count = 0
   For i=0 To ypoints-1
     For j=0 To xpoints-1
       r(0) = xpos(j)
@@ -131,20 +161,8 @@ Sub KickMap()
       ks = GetKicks(energy, r, zmax, rkstep)
       kickx(i,j) = ks(0)
       kicky(i,j) = ks(1)
-      count = count + 1
-      frac = 100*count/(ypoints*xpoints)
-      On Error Resume Next
-        UpdateStatusBar(frac)
-      If (Err.Number) Then
-        Window.close
-        Exit Sub
-      End If
-      On Error Goto 0
     Next
   Next
-
-  UpdateStatusBar(100)
-  Window.close
 
   If (out_of_lim) Then
     Dim button
@@ -301,37 +319,6 @@ Sub WriteKickMap(filename, energy, length, xpos, ypos, kickx, kicky)
   objFile.Close
 
 End Sub
-
-
-Sub UpdateStatusBar(value)
-    Dim StrValue
-    StrValue = FormatNumber(value, 2)
-    Window.output.innerhtml = StrValue
-End Sub
-
-
-Function CreateStatusWindow()
-    Dim signature, shellwnd, proc
-    On Error Resume Next
-    Set CreateWindow = nothing
-    signature = left(createobject("Scriptlet.TypeLib").guid, 38)
-
-    Dim cmd1, cmd2, cmd3, cmd4
-    cmd1 = "<script>moveTo(-32000,-32000);</script>"
-    cmd2 = "<hta:application id=app border=dialog minimizebutton=no maximizebutton=no scroll=no showintaskbar=yes contextmenu=no selection=no innerborder=no />"
-    cmd3 = "<object id='shellwindow' classid='clsid:8856F961-340A-11D0-A96B-00C04FD705A2'><param name=RegisterAsBrowser value=1></object>"
-    cmd4 = "<script>shellwindow.putproperty('" & signature & "',document.parentWindow);</script>"
-    Set proc = createobject("WScript.Shell").exec("mshta about:""" & cmd1 & cmd2 & cmd3 & cmd4 & """")
-
-    Do
-        If proc.status > 0 Then Exit Function
-        For Each shellwnd in createobject("Shell.Application").windows
-            Set CreateWindow = shellwnd.getproperty(signature)
-            if err.number = 0 Then Exit Function
-            err.clear
-        Next
-    Loop
-End Function
 
 
 Sub Import(strFile)

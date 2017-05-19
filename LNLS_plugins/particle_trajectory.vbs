@@ -44,12 +44,11 @@ Sub ParticleTrajectory()
 	If isNull(nproblem) Then Exit Sub End If
 	If not isNumeric(nproblem) Then Exit Sub End If
 
-  Call Doc.getSolution.getProblem(nproblem).getGeometricExtents("", lim_xmin, lim_ymin, lim_zmin, lim_xmax, lim_ymax, lim_zmax)
-
   Dim xmin
   Dim ymin
   Dim zmin
   Dim zmax
+  Dim ztemp
   Dim energy
 
   energy = GetVariableValue("Particle energy (GeV)", "Kick Map", "3", EmptyVar)
@@ -62,11 +61,45 @@ Sub ParticleTrajectory()
   ymin = GetVariableValue("Initial Y (mm)", "Particle Trajectory", "0", EmptyVar)
   If isNull(ymin) Then Exit Sub End If
 
-  zmin = GetVariableValue("Initial Z (mm)", "Particle Trajectory", CStr(lim_zmin), EmptyVar)
+  zmin = GetVariableValue("Initial Z (mm)", "Particle Trajectory", "0", EmptyVar)
   If isNull(zmin) Then Exit Sub End If
 
-  zmax = GetVariableValue("Final Z (mm)", "Particle Trajectory", CStr(lim_zmax), EmptyVar)
+  zmax = GetVariableValue("Final Z (mm)", "Particle Trajectory", "500", EmptyVar)
   If isNull(zmax) Then Exit Sub End If
+
+  If zmin > zmax Then
+    ztemp = zmin
+    zmin = zmax
+    zmax = ztemp
+  End If
+
+  Set Mesh = Doc.getSolution.getMesh(nproblem)
+
+  Call Mesh.getGeometricExtents(lim_xmin, lim_ymin, lim_zmin, lim_xmax, lim_ymax, lim_zmax)
+
+  If xmin < lim_xmin or xmin > lim_xmax Then
+    MsgBox("Initial X is out of the field matrix.")
+    Exit Sub
+  End If
+
+  If ymin < lim_ymin or ymin > lim_ymax Then
+    MsgBox("Initial Y is out of the field matrix.")
+    Exit Sub
+  End If
+
+  If zmin < lim_zmin Then
+    MsgBox("Initial Z is out of the field matrix.")
+    Exit Sub
+  End If
+
+  If zmax > lim_zmax Then
+    MsgBox("Final Z is out of the field matrix.")
+    Exit Sub
+  End If
+
+  Set Fieldx = Doc.getSolution.getSystemField(Mesh,"B x")
+  Set Fieldy = Doc.getSolution.getSystemField(Mesh,"B y")
+  Set Fieldz = Doc.getSolution.getSystemField(Mesh,"B z")
 
   xmin   = xmin/1000
   ymin   = ymin/1000
@@ -74,11 +107,6 @@ Sub ParticleTrajectory()
   zmax   = zmax/1000
 
   out_of_lim = False
-
-  Set Mesh = Doc.getSolution.getMesh(nproblem)
-  Set Fieldx = Doc.getSolution.getSystemField(Mesh,"B x")
-  Set Fieldy = Doc.getSolution.getSystemField(Mesh,"B y")
-  Set Fieldz = Doc.getSolution.getSystemField(Mesh,"B z")
 
   Dim r(6)
   r(0) = xmin
@@ -232,7 +260,7 @@ Sub SaveTrajectory(trajectory, filename)
   Dim objFile
   Set objFile = objFSO.CreateTextFile(filename, True)
 
-  objFile.Write "x[mm]    y[mm]    z[mm]    dx/ds    dy/ds    dz/ds" & vbCrlf
+  objFile.Write "x[m]    y[m]    z[m]    dx/ds    dy/ds    dz/ds" & vbCrlf
 	objFile.Write "------------------------------------------------------------------------------------------------------------------------------------------------------------------" & vbCrlf
 
   Dim i
