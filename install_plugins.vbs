@@ -63,12 +63,16 @@ Sub Install_Plugins()
   Dim FieldSamplerPath
   Dim FieldMultipolesPath
   Dim CoilResistancePath
+  Dim ParticleTrajectoryPath
+  Dim KickMapPath
 
   DrawShapePath = objFSO.BuildPath(PluginsInstallationDir, "draw_shape.vbs")
   VertexParamPath = objFSO.BuildPath(PluginsInstallationDir, "vertex_parametrization.vbs")
   FieldSamplerPath = objFSO.BuildPath(PluginsInstallationDir, "field_sampler.vbs")
   FieldMultipolesPath = objFSO.BuildPath(PluginsInstallationDir, "field_multipoles.vbs")
   CoilResistancePath = objFSO.BuildPath(PluginsInstallationDir, "coil_resistance.vbs")
+  ParticleTrajectoryPath = objFSO.BuildPath(PluginsInstallationDir, "particle_trajectory.vbs")
+  KickMapPath = objFSO.BuildPath(PluginsInstallationDir, "kick_map.vbs")
 
   Set objFile = objFSO.OpenTextFile(EventHandlersFilename, 1)
   FileContent = objFile.ReadAll
@@ -94,7 +98,11 @@ Sub Install_Plugins()
               Chr(9) & "command = ""runScript("" & Chr(34) & """ & FieldMultipolesPath & """ & Chr(34) & "")""" & vbCrLf & _
               Chr(9) & "macromenu.appendItem ""Field Multipoles"", command" & vbCrLf & vbCrLf & _
               Chr(9) & "command = ""runScript("" & Chr(34) & """ & CoilResistancePath & """ & Chr(34) & "")""" & vbCrLf & _
-              Chr(9) & "macromenu.appendItem ""Coil Resistance"", command" & vbCrLf & _
+              Chr(9) & "macromenu.appendItem ""Coil Resistance"", command" & vbCrLf & vbCrLf & _
+              Chr(9) & "command = ""runScript("" & Chr(34) & """ & ParticleTrajectoryPath & """ & Chr(34) & "")""" & vbCrLf & _
+              Chr(9) & "macromenu.appendItem ""Particle Trajectory"", command" & vbCrLf & vbCrLf & _
+              Chr(9) & "command = ""runScript("" & Chr(34) & """ & KickMapPath & """ & Chr(34) & "")""" & vbCrLf & _
+              Chr(9) & "macromenu.appendItem ""Kick Map"", command" & vbCrLf & _
               Chr(9) & "'================================================================================================='" & vbCrLf & _
               Chr(9) & "'LNLS Plugins End'"
 
