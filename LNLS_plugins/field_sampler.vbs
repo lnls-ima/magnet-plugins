@@ -37,29 +37,34 @@ Sub FieldSampler()
 	If isNull(nproblem) Then Exit Sub End If
 	If not isNumeric(nproblem) Then Exit Sub End If
 
-	If getDocument().getProblem().IsCoil("MainCoil") Then
-		Call getDocument.getProblem( nproblem ).getParameter("MainCoil", "Current", MainCoilCurrent)
-		Call getDocument.getProblem( nproblem ).getParameter("MainCoil", "NumberOfTurns", MainCoilTurns)
+	CoilInfo = GetCoilInfo(Doc, nproblem, "main")
+	If not isNull(CoilInfo) Then
+		MainCoilCurrent = CoilInfo(0)
+		MainCoilTurns = CoilInfo(1)
 	End If
 
-	If getDocument().getProblem().IsCoil("TrimCoil") Then
-		Call getDocument.getProblem( nproblem ).getParameter("TrimCoil", "Current", TrimCoilCurrent)
-		Call getDocument.getProblem( nproblem ).getParameter("TrimCoil", "NumberOfTurns", TrimCoilTurns)
+	CoilInfo = GetCoilInfo(Doc, nproblem, "trim")
+	If not isNull(CoilInfo) Then
+		TrimCoilCurrent = CoilInfo(0)
+		TrimCoilTurns = CoilInfo(1)
 	End If
 
-	If getDocument().getProblem().IsCoil("CHCoil") Then
-		Call getDocument.getProblem( nproblem ).getParameter("CHCoil", "Current", CHCoilCurrent)
-		Call getDocument.getProblem( nproblem ).getParameter("CHCoil", "NumberOfTurns", CHCoilTurns)
+	CoilInfo = GetCoilInfo(Doc, nproblem, "ch")
+	If not isNull(CoilInfo) Then
+		CHCoilCurrent = CoilInfo(0)
+		CHCoilTurns = CoilInfo(1)
 	End If
 
-	If getDocument().getProblem().IsCoil("CVCoil") Then
-		Call getDocument.getProblem( nproblem ).getParameter("CVCoil", "Current", CVCoilCurrent)
-		Call getDocument.getProblem( nproblem ).getParameter("CVCoil", "NumberOfTurns", CVCoilTurns)
+	CoilInfo = GetCoilInfo(Doc, nproblem, "cv")
+	If not isNull(CoilInfo) Then
+		CVCoilCurrent = CoilInfo(0)
+		CVCoilTurns = CoilInfo(1)
 	End If
 
-	If getDocument().getProblem().IsCoil("QSCoil") Then
-		Call getDocument.getProblem( nproblem ).getParameter("QSCoil", "Current", QSCoilCurrent)
-		Call getDocument.getProblem( nproblem ).getParameter("QSCoil", "NumberOfTurns", QSCoilTurns)
+	CoilInfo = GetCoilInfo(Doc, nproblem, "qs")
+	If not isNull(CoilInfo) Then
+		QSCoilCurrent = CoilInfo(0)
+		QSCoilTurns = CoilInfo(1)
 	End If
 
 	Dim BoxTitle
@@ -120,49 +125,49 @@ Sub FieldSampler()
 	Set Field2 = Doc.getSolution.getSystemField (Mesh,"B y")
 	Set Field3 = Doc.getSolution.getSystemField (Mesh,"B z")
 
-	objFile.Write "fieldmap_name:" & vbTab & vbTab & MagnetName & " " & Model & vbCrlf
-	objFile.Write "timestamp:" & vbTab & vbTab & GetDate() & "_" & GetTime() & vbCrlf
-	objFile.Write "filename:" & vbTab & vbTab & Filename & vbCrlf
-	objFile.Write "nr_magnets:" & vbTab & vbTab & CStr( 1 ) & vbCrlf
+	objFile.Write "fieldmap_name:     " & vbTab & MagnetName & " " & Model & vbCrlf
+	objFile.Write "timestamp:         " & vbTab & GetDate() & "_" & GetTime() & vbCrlf
+	objFile.Write "filename:          " & vbTab & Filename & vbCrlf
+	objFile.Write "nr_magnets:        " & vbTab & CStr( 1 ) & vbCrlf
 	objFile.Write vbCrlf
-	objFile.Write "magnet_name:" & vbTab & vbTab & MagnetName & vbCrlf
-	objFile.Write "gap[mm]:" & vbTab & vbTab & vbCrlf
-	objFile.Write "control_gap[mm]:" & vbTab & "--" & vbCrlf
-	objFile.Write "magnet_length[mm]:" & vbTab  & vbCrlf
+	objFile.Write "magnet_name:       " & vbTab & MagnetName & vbCrlf
+	objFile.Write "gap[mm]:           " & vbTab & vbCrlf
+	objFile.Write "control_gap[mm]:   " & vbTab & "--" & vbCrlf
+	objFile.Write "magnet_length[mm]: " & vbTab & vbCrlf
 
 	If not IsEmpty( MainCoilCurrent ) Then
-		objFile.Write "current_main[A]:" & vbTab & CStr( MainCoilCurrent ) & vbCrlf
-		objFile.Write "NI_main[A.esp]:" & vbTab & vbTab & CStr( MainCoilCurrent*MainCoilTurns) & vbCrlf
+		objFile.Write "current_main[A]:   " & vbTab & CStr( MainCoilCurrent ) & vbCrlf
+		objFile.Write "NI_main[A.esp]:    " & vbTab & CStr( MainCoilCurrent*MainCoilTurns) & vbCrlf
 	Else
-		objFile.Write "current_main[A]:" & vbTab & vbCrlf
-		objFile.Write "NI_main[A.esp]:" & vbTab & vbTab & vbCrlf
+		objFile.Write "current_main[A]:   " & vbTab & "--" & vbCrlf
+		objFile.Write "NI_main[A.esp]:    " & vbTab & "--" & vbCrlf
 	End If
 
 	If not IsEmpty( TrimCoilCurrent ) Then
-		objFile.Write "current_trim[A]:" & vbTab & CStr( TrimCoilCurrent ) & vbCrlf
-		objFile.Write "NI_trim[A.esp]:" & vbTab & vbTab & CStr( TrimCoilCurrent*TrimCoilTurns) & vbCrlf
+		objFile.Write "current_trim[A]:   " & vbTab & CStr( TrimCoilCurrent ) & vbCrlf
+		objFile.Write "NI_trim[A.esp]:    " & vbTab & CStr( TrimCoilCurrent*TrimCoilTurns) & vbCrlf
 	End If
 
 	If not IsEmpty( CHCoilCurrent ) Then
-		objFile.Write "current_ch[A]:" & vbTab & vbTab & CStr( CHCoilCurrent ) & vbCrlf
-		objFile.Write "NI_ch[A.esp]:" & vbTab & vbTab & CStr( CHCoilCurrent*CHCoilTurns ) & vbCrlf
+		objFile.Write "current_ch[A]:     " & vbTab & CStr( CHCoilCurrent ) & vbCrlf
+		objFile.Write "NI_ch[A.esp]:      " & vbTab & CStr( CHCoilCurrent*CHCoilTurns ) & vbCrlf
 	End If
 
 	If not IsEmpty( CVCoilCurrent ) Then
-		objFile.Write "current_cv[A]:" & vbTab & vbTab & CStr( CVCoilCurrent ) & vbCrlf
-		objFile.Write "NI_cv[A.esp]:" & vbTab & vbTab & CStr( CVCoilCurrent*CVCoilTurns ) & vbCrlf
+		objFile.Write "current_cv[A]:     " & vbTab & CStr( CVCoilCurrent ) & vbCrlf
+		objFile.Write "NI_cv[A.esp]:      " & vbTab & CStr( CVCoilCurrent*CVCoilTurns ) & vbCrlf
 	End If
 
 	If not IsEmpty( QSCoilCurrent ) Then
-		objFile.Write "current_qs[A]:" & vbTab & vbTab & CStr( QSCoilCurrent ) & vbCrlf
-		objFile.Write "NI_qs[A.esp]:" & vbTab & vbTab & CStr( QSCoilCurrent*QSCoilTurns ) & vbCrlf
+		objFile.Write "current_qs[A]:     " & vbTab & CStr( QSCoilCurrent ) & vbCrlf
+		objFile.Write "NI_qs[A.esp]:      " & vbTab & CStr( QSCoilCurrent*QSCoilTurns ) & vbCrlf
 	End If
 
-	objFile.Write "center_pos_z[mm]:" & vbTab & CStr( 0 ) & vbCrlf
-	objFile.Write "center_pos_x[mm]:" & vbTab & CStr( 0 ) & vbCrlf
-	objFile.Write "rotation[deg]:" & vbTab & vbTab & CStr( 0 ) & vbCrlf
+	objFile.Write "center_pos_z[mm]:  " & vbTab & CStr( 0 ) & vbCrlf
+	objFile.Write "center_pos_x[mm]:  " & vbTab & CStr( 0 ) & vbCrlf
+	objFile.Write "rotation[deg]:     " & vbTab & CStr( 0 ) & vbCrlf
 	objFile.Write vbCrlf
-	objFile.Write "X[mm]" & vbTab & vbTab & "Y[mm]" & vbTab & vbTab & "Z[mm]" & vbTab & vbTab & "Bx" & vbTab & vbTab & "By" & vbTab & vbTab & "Bz [T]" & vbCrlf
+	objFile.Write "X[mm]" & vbTab & "Y[mm]" & vbTab & "Z[mm]" & vbTab & "Bx" & vbTab & "By" & vbTab & "Bz [T]" & vbCrlf
 	objFile.Write "------------------------------------------------------------------------------------------------------------------------------------------------------------------" & vbCrlf
 
 	For k=0 to zpoints-1
@@ -174,14 +179,45 @@ Sub FieldSampler()
 				Call Field1.getFieldAtPoint (x, y, z, bx)
 				Call Field2.getFieldAtPoint (x, y, z, by)
 				Call Field3.getFieldAtPoint (x, y, z, bz)
-				objFile.Write CStr(x) & vbTab & vbTab & CStr(y) & vbTab & vbTab & CStr(z) & vbTab & vbTab & CStr(bx(0)) & vbTab & vbTab & CStr(by(0)) & vbTab & vbTab & CStr(bz(0)) & vbCrlf
+				objFile.Write CStr(x) & vbTab & CStr(y) & vbTab & CStr(z) & vbTab & CStr(bx(0)) & vbTab & CStr(by(0)) & vbTab & CStr(bz(0)) & vbCrlf
 			Next
 		Next
 	Next
 
 	objFile.Close
 
+
 End Sub
+
+Function GetCoilInfo(Doc, nproblem, CoilType)
+	Dim NrCoils
+	Dim CoilCurrent
+	Dim CoilTurns
+	Dim CoilName
+	Dim LCoilName
+	Dim CoilInfo
+	ReDim CoilInfo(2)
+	NrCoils = Doc.getNumberOfCoils()
+
+	CoilType = LCase(CoilType)
+
+	Dim i
+	For i=1 to NrCoils
+		CoilName = Doc.getPathOfCoil(i)
+		LCoilName = LCase(CoilName)
+		If InStr(LCoilName, CoilType) Then
+			Call Doc.getProblem(nproblem).getParameter(CoilName, "Current", CoilCurrent)
+			Call Doc.getProblem(nproblem).getParameter(CoilName, "NumberOfTurns", CoilTurns)
+			CoilInfo(0) = CoilCurrent
+			CoilInfo(1) = CoilTurns
+			GetCoilInfo = CoilInfo
+			Exit Function
+		End If
+	Next
+
+	GetCoilInfo = Null
+
+End Function
 
 
 Sub Import(strFile)

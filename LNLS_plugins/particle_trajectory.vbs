@@ -3,6 +3,7 @@ Option Explicit
 Import("auxiliary_functions.vbs")
 
 Const rkstep = 0.0001 '[m]
+Const tolerance = 1e-9 '[m]
 Const max_loops = 1e8
 
 Dim objFSO
@@ -77,22 +78,22 @@ Sub ParticleTrajectory()
 
   Call Mesh.getGeometricExtents(lim_xmin, lim_ymin, lim_zmin, lim_xmax, lim_ymax, lim_zmax)
 
-  If xmin < lim_xmin or xmin > lim_xmax Then
+  If xmin < lim_xmin - 1000*tolerance or xmin > lim_xmax + 1000*tolerance Then
     MsgBox("Initial X is out of the field matrix.")
     Exit Sub
   End If
 
-  If ymin < lim_ymin or ymin > lim_ymax Then
+  If ymin < lim_ymin - 1000*tolerance or ymin > lim_ymax + 1000*tolerance Then
     MsgBox("Initial Y is out of the field matrix.")
     Exit Sub
   End If
 
-  If zmin < lim_zmin Then
+  If zmin < lim_zmin - 1000*tolerance Then
     MsgBox("Initial Z is out of the field matrix.")
     Exit Sub
   End If
 
-  If zmax > lim_zmax Then
+  If zmax > lim_zmax + 1000*tolerance Then
     MsgBox("Final Z is out of the field matrix.")
     Exit Sub
   End If
@@ -143,7 +144,19 @@ Function GetMagnetField(ByVal r)
   field(1) = 0
   field(2) = 0
 
-  If (1000*r(0) < lim_xmin) or (1000*r(0) > lim_xmax) or (1000*r(1) < lim_ymin) or (1000*r(1) > lim_ymax) or (1000*r(2) < lim_zmin) or (1000*r(2) > lim_zmax) Then
+  If (1000*r(0) < lim_xmin - tolerance) or (1000*r(0) > lim_xmax + tolerance) Then
+    out_of_lim = True
+    GetMagnetField = field
+    Exit Function
+  End If
+
+  If (1000*r(1) < lim_ymin - tolerance) or (1000*r(1) > lim_ymax + tolerance) Then
+    out_of_lim = True
+    GetMagnetField = field
+    Exit Function
+  End If
+
+  If (1000*r(2) < lim_zmin - tolerance) or (1000*r(2) > lim_zmax + tolerance) Then
     out_of_lim = True
     GetMagnetField = field
     Exit Function
@@ -225,6 +238,8 @@ Function RungeKuttaTrajectory(ByVal energy, ByVal r0, ByVal zmax, ByVal rkstep)
     End If
 
     trajectory(count) = r
+
+    If (out_of_lim) Then Exit Function End If
 
   Loop
 
