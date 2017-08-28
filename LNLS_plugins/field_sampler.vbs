@@ -137,30 +137,30 @@ Sub FieldSampler()
 
 	If not IsEmpty( MainCoilCurrent ) Then
 		objFile.Write "current_main[A]:   " & vbTab & CStr( MainCoilCurrent ) & vbCrlf
-		objFile.Write "NI_main[A.esp]:    " & vbTab & CStr( MainCoilCurrent*MainCoilTurns) & vbCrlf
+		objFile.Write "nr_turns_main:     " & vbTab & CStr( MainCoilCurrent*MainCoilTurns) & vbCrlf
 	Else
 		objFile.Write "current_main[A]:   " & vbTab & "--" & vbCrlf
-		objFile.Write "NI_main[A.esp]:    " & vbTab & "--" & vbCrlf
+		objFile.Write "nr_turns_main:     " & vbTab & "--" & vbCrlf
 	End If
 
 	If not IsEmpty( TrimCoilCurrent ) Then
 		objFile.Write "current_trim[A]:   " & vbTab & CStr( TrimCoilCurrent ) & vbCrlf
-		objFile.Write "NI_trim[A.esp]:    " & vbTab & CStr( TrimCoilCurrent*TrimCoilTurns) & vbCrlf
+		objFile.Write "nr_turns_trim:     " & vbTab & CStr( TrimCoilCurrent*TrimCoilTurns) & vbCrlf
 	End If
 
 	If not IsEmpty( CHCoilCurrent ) Then
 		objFile.Write "current_ch[A]:     " & vbTab & CStr( CHCoilCurrent ) & vbCrlf
-		objFile.Write "NI_ch[A.esp]:      " & vbTab & CStr( CHCoilCurrent*CHCoilTurns ) & vbCrlf
+		objFile.Write "nr_turns_ch:       " & vbTab & CStr( CHCoilCurrent*CHCoilTurns ) & vbCrlf
 	End If
 
 	If not IsEmpty( CVCoilCurrent ) Then
 		objFile.Write "current_cv[A]:     " & vbTab & CStr( CVCoilCurrent ) & vbCrlf
-		objFile.Write "NI_cv[A.esp]:      " & vbTab & CStr( CVCoilCurrent*CVCoilTurns ) & vbCrlf
+		objFile.Write "nr_turns_cv:       " & vbTab & CStr( CVCoilCurrent*CVCoilTurns ) & vbCrlf
 	End If
 
 	If not IsEmpty( QSCoilCurrent ) Then
 		objFile.Write "current_qs[A]:     " & vbTab & CStr( QSCoilCurrent ) & vbCrlf
-		objFile.Write "NI_qs[A.esp]:      " & vbTab & CStr( QSCoilCurrent*QSCoilTurns ) & vbCrlf
+		objFile.Write "nr_turns_qs:       " & vbTab & CStr( QSCoilCurrent*QSCoilTurns ) & vbCrlf
 	End If
 
 	objFile.Write "center_pos_z[mm]:  " & vbTab & CStr( 0 ) & vbCrlf
