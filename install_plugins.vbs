@@ -116,6 +116,8 @@ Sub Install_Plugins()
 
   NewContent = FirstPartContent & "Sub Application_OnLoad()" & NewLines & SecondPartContent
 
+  objShell.Run "attrib -r """ & EventHandlersFilename & """", 0, True
+
   Set objFile = objFSO.OpenTextFile(EventHandlersFilename, 2)
   objFile.WriteLine NewContent
   objFile.Close
