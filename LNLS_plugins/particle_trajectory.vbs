@@ -2,7 +2,6 @@ Option Explicit
 
 Import("auxiliary_functions.vbs")
 
-Const rkstep = 0.0001 '[m]
 Const tolerance = 1e-9 '[m]
 Const max_loops = 1e8
 
@@ -51,6 +50,7 @@ Sub ParticleTrajectory()
   Dim zmax
   Dim ztemp
   Dim energy
+  Dim rkstep
 
   energy = GetVariableValue("Particle energy (GeV)", "Kick Map", "3", EmptyVar)
   If isNull(energy) Then Exit Sub End If
@@ -67,6 +67,10 @@ Sub ParticleTrajectory()
 
   zmax = GetVariableValue("Final Z (mm)", "Particle Trajectory", "500", EmptyVar)
   If isNull(zmax) Then Exit Sub End If
+
+  rkstep = GetVariableValue("Runge-Kutta Step (mm)", "Kick Map", "0.1", EmptyVar)
+  If isNull(rkstep) Then Exit Sub End If
+  rkstep = rkstep/1000
 
   If zmin > zmax Then
     ztemp = zmin

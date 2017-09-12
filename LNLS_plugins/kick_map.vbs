@@ -2,7 +2,6 @@ Option Explicit
 
 Import("auxiliary_functions.vbs")
 
-Const rkstep = 0.0001 '[m]
 Const tolerance = 1e-9 '[m]
 Const max_loops = 1e8
 
@@ -51,6 +50,7 @@ Sub KickMap()
   Dim ymin, ymax, ypoints, ystep
   Dim zmin, zmax, ztemp, length
   Dim energy
+  Dim rkstep
 
   energy = GetVariableValue("Particle energy (GeV)", "Kick Map", "3", EmptyVar)
   If isNull(energy) Then Exit Sub End If
@@ -75,6 +75,10 @@ Sub KickMap()
 
   zmax = GetVariableValue("Final Z (mm)", "Kick Map", "500", EmptyVar)
   If isNull(zmax) Then Exit Sub End If
+
+  rkstep = GetVariableValue("Runge-Kutta Step (mm)", "Kick Map", "0.1", EmptyVar)
+  If isNull(rkstep) Then Exit Sub End If
+  rkstep = rkstep/1000
 
   MsgBox("The kick map calculation may take several minutes." & vbCrlf & "The application will be locked until it is finished.")
 
@@ -288,7 +292,7 @@ Sub WriteKickMap(filename, energy, length, xpos, ypos, kickx, kicky)
   ndig = 7
 
   objFile.Write "# KICKMAP" & vbCrlf
-  objFile.Write "# Author: Magnet User, Date: " & GetDate() & vbCrlf
+  objFile.Write "# Author: MagNet User, Date: " & GetDate() & vbCrlf
   objFile.Write "# Total Length of Longitudinal Interval [m]" & vbCrlf
   objFile.Write CStr(length) & vbCrlf
   objFile.Write "# Number of Horizontal Points" & vbCrlf
