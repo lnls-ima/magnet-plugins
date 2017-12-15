@@ -312,6 +312,50 @@ Function GetDate()
 End Function
 
 
+Sub Plot(x, y, title, xlabel, ylabel)
+	Dim npts
+	npts = Ubound(x)
+	if (Ubound(y) <> npts) Then
+		MsgBox("PlotError: x and y must have the same number of points.")
+		Exit Sub
+	End If
+
+	Dim data
+	ReDim data(npts, 1)
+
+	For i = 0 To npts
+			data(i, 0) = x(i)
+			data(i, 1) = y(i)
+	Next
+
+	Dim chartname
+	chartname = title & "Chart"
+
+	If (getDocument().getChartManager().hasChart(chartname)) then
+		getDocument().getChartManager().getChart(chartname).close()
+	End If
+
+	Call getDocument().getChartManager().newChart(chartname)
+
+	Set chart = getDocument().getChartManager().getChart(chartname)
+
+	Call chart.setTitle(title)
+
+	Dim curvename
+	curvename = title & "Curve"
+
+	Call chart.newCurve(curvename)
+
+	Set curve = chart.getCurve(curvename)
+
+	Call curve.setData(data)
+	Call curve.setTitle(title)
+	Call curve.setPrimaryXAxisTitle(xlabel)
+	Call curve.setPrimaryYAxisTitle(ylabel)
+
+End Sub
+
+
 Function NewtonLorentzEquation(ByVal alpha, ByVal r, ByVal b)
 
   Dim drds(6)
