@@ -49,12 +49,13 @@ Sub KickMap()
   Dim xmin, xmax, xpoints, xstep
   Dim ymin, ymax, ypoints, ystep
   Dim zmin, zmax, ztemp, length
-  Dim energy
+  Dim energy_GeV, energy
   Dim rkstep
+  Dim clicked
 
-  energy = GetVariableValue("Particle energy (GeV)", "Kick Map", "3", EmptyVar)
+  energy_GeV = GetVariableValue("Particle energy (GeV)", "Kick Map", "3", EmptyVar)
   If isNull(energy) Then Exit Sub End If
-  energy = (1e9)*energy
+  energy = (1e9)*energy_GeV
 
   Range = GetVariableRange("X coordinate (mm)", "Kick Map", "0 10 1", EmptyVar)
 	If isNull(Range) Then Exit Sub End If
@@ -78,9 +79,21 @@ Sub KickMap()
 
   rkstep = GetVariableValue("Runge-Kutta Step (mm)", "Kick Map", "0.1", EmptyVar)
   If isNull(rkstep) Then Exit Sub End If
-  rkstep = rkstep/1000
 
-  MsgBox("The kick map calculation may take several minutes." & vbCrlf & "The application will be locked until it is finished.")
+  clicked = MsgBox("Problem ID:" & vbTab & vbTab & Cstr(nproblem) & _
+  vbCrlf & "Particle energy (GeV):" & vbTab & Cstr(energy_GeV) & _
+  vbCrlf & "X coordinate (mm):" & vbTab & vbTab & "[" & Cstr(xmin) & ", " & Cstr(xmax) & "] -> " & Cstr(xpoints) & " points" & _
+  vbCrlf & "Y coordinate (mm):" & vbTab & vbTab & "[" & Cstr(ymin) & ", " & Cstr(ymax) & "] -> " & Cstr(ypoints) & " points" & _
+  vbCrlf & "Initial Z (mm):" & vbTab & vbTab & Cstr(zmin) & _
+  vbCrlf & "Final Z (mm):" & vbTab & vbTab & Cstr(zmax) & _
+  vbCrlf & "Runge-Kutta Step (mm):" & vbTab & Cstr(rkstep) & _
+  vbCrlf & _
+  vbCrlf & "The kick map calculation may take several minutes." & _
+  vbCrlf & "The application will be locked until it is finished.", 1, "Kick Map")
+
+  If (clicked <> 1) Then
+    Exit Sub
+  End If
 
   If zmin > zmax Then
     ztemp = zmin
@@ -93,35 +106,36 @@ Sub KickMap()
   Call Mesh.getGeometricExtents(lim_xmin, lim_ymin, lim_zmin, lim_xmax, lim_ymax, lim_zmax)
 
   If xmin < lim_xmin - 1000*tolerance Then
-    MsgBox("Initial X is out of the field matrix.")
+    Call MsgBox("Initial X is out of the field matrix.", 0, "Kick Map")
     Exit Sub
   End If
 
   If xmax > lim_xmax + 1000*tolerance Then
-    MsgBox("Final X is out of the field matrix.")
+    Call MsgBox("Final X is out of the field matrix.", 0, "Kick Map")
     Exit Sub
   End If
 
   If ymin < lim_ymin - 1000*tolerance Then
-    MsgBox("Initial Y is out of the field matrix.")
+    Call MsgBox("Initial Y is out of the field matrix.", 0, "Kick Map")
     Exit Sub
   End If
 
   If ymax > lim_ymax + 1000*tolerance Then
-    MsgBox("Final Y is out of the field matrix.")
+    Call MsgBox("Final Y is out of the field matrix.", 0, "Kick Map")
     Exit Sub
   End If
 
   If zmin < lim_zmin - 1000*tolerance Then
-    MsgBox("Initial Z is out of the field matrix.")
+    Call MsgBox("Initial Z is out of the field matrix.", 0, "Kick Map")
     Exit Sub
   End If
 
   If zmax > lim_zmax + 1000*tolerance Then
-    MsgBox("Final Z is out of the field matrix.")
+    Call MsgBox("Final Z is out of the field matrix.", 0, "Kick Map")
     Exit Sub
   End If
 
+  rkstep = rkstep/1000
   xmin   = xmin/1000
 	xmax   = xmax/1000
   xstep  = xstep/1000
@@ -171,12 +185,12 @@ Sub KickMap()
 
   If (out_of_lim) Then
     Dim button
-    button = MsgBox("At least one trajectory travelled out of the field matrix." & vbCrlf & "Save Kick Map?", vbYesNo)
+    button = MsgBox("At least one trajectory travelled out of the field matrix." & vbCrlf & "Save Kick Map?", vbYesNo, "Kick Map")
     If (button <> 6) Then Exit Sub End If
   End If
 
   Call WriteKickMap(FullFilename, energy, length, xpos, ypos, kickx, kicky)
-  MsgBox("Kick Map saved in file: " & vbCrlf & vbCrlf & FileName)
+  Call MsgBox("Kick Map saved in file: " & vbCrlf & vbCrlf & FileName, 0, "Kick Map")
 
 End Sub
 
