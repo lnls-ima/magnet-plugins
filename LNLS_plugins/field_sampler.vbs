@@ -113,6 +113,9 @@ Sub FieldSampler()
 		Model = ""
 	End If
 
+	Smoothed = GetVariableValue("Smoothed field:" & vbCrlf & "0 - No" & vbCrlf & "1 - Yes", BoxTitle, "0", EmptyVar)
+	If isNull(Smoothed) Then Exit Sub End If
+
 	Filename = GetVariableString("Enter the file name:", BoxTitle, DefaultName, EmptyVar)
 	If isNull(Filename) Then Exit Sub End If
 
@@ -121,9 +124,20 @@ Sub FieldSampler()
 	Set objFile = objFSO.CreateTextFile(FullFilename, True)
 
 	Set Mesh = Doc.getSolution.getMesh( nproblem )
-	Set Field1 = Doc.getSolution.getSystemField (Mesh,"B x")
-	Set Field2 = Doc.getSolution.getSystemField (Mesh,"B y")
-	Set Field3 = Doc.getSolution.getSystemField (Mesh,"B z")
+
+	If Smoothed Then
+		Bxname = "B x smoothed"
+		Byname = "B y smoothed"
+		Bzname = "B z smoothed"
+	Else
+		Bxname = "B x"
+		Byname = "B y"
+		Bzname = "B z"
+	End If
+
+	Set Field1 = Doc.getSolution.getSystemField (Mesh, Bxname)
+	Set Field2 = Doc.getSolution.getSystemField (Mesh, Byname)
+	Set Field3 = Doc.getSolution.getSystemField (Mesh, Bzname)
 
 	objFile.Write "fieldmap_name:     " & vbTab & MagnetName & " " & Model & vbCrlf
 	objFile.Write "timestamp:         " & vbTab & GetDate() & "_" & GetTime() & vbCrlf
