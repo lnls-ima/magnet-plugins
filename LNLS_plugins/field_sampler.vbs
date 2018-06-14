@@ -103,6 +103,13 @@ Sub FieldSampler()
 	If not IsEmpty( CVCoilCurrent ) Then DefaultName = DefaultName & "_Icv=" & CStr( CVCoilCurrent ) & "A" End If
 	If not IsEmpty( QSCoilCurrent ) Then DefaultName = DefaultName & "_Iqs=" & CStr( QSCoilCurrent ) & "A" End If
 
+	Smoothed = GetVariableValue("Smoothed field:" & vbCrlf & "0 - No" & vbCrlf & "1 - Yes", BoxTitle, "0", EmptyVar)
+	If isNull(Smoothed) Then Exit Sub End If
+
+	If Smoothed Then
+		DefaultName = DefaultName & "_smoothed"
+	End If
+
 	DefaultName = DefaultName & ".txt"
 
 	SplitName = Split( DefaultName, "_")
@@ -112,9 +119,6 @@ Sub FieldSampler()
 	Else
 		Model = ""
 	End If
-
-	Smoothed = GetVariableValue("Smoothed field:" & vbCrlf & "0 - No" & vbCrlf & "1 - Yes", BoxTitle, "0", EmptyVar)
-	If isNull(Smoothed) Then Exit Sub End If
 
 	Filename = GetVariableString("Enter the file name:", BoxTitle, DefaultName, EmptyVar)
 	If isNull(Filename) Then Exit Sub End If
@@ -139,9 +143,12 @@ Sub FieldSampler()
 	Set Field2 = Doc.getSolution.getSystemField (Mesh, Byname)
 	Set Field3 = Doc.getSolution.getSystemField (Mesh, Bzname)
 
+	MagNetFile = Split( DocumentName, ".mn")(0) & ".mn"
+
 	objFile.Write "fieldmap_name:     " & vbTab & MagnetName & " " & Model & vbCrlf
 	objFile.Write "timestamp:         " & vbTab & GetDate() & "_" & GetTime() & vbCrlf
 	objFile.Write "filename:          " & vbTab & Filename & vbCrlf
+	objFile.Write "MagNet_file:       " & vbTab & MagNetFile & vbCrlf
 	objFile.Write "nr_magnets:        " & vbTab & CStr( 1 ) & vbCrlf
 	objFile.Write vbCrlf
 	objFile.Write "magnet_name:       " & vbTab & MagnetName & vbCrlf
