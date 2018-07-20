@@ -96,6 +96,8 @@ Function ProcessDocumentName(DocumentName)
 
 	DefaultName = Split( DocumentName, ".mn")(0)
 	DefaultName = Split( DefaultName, "_solved")(0)
+  DefaultName = Split( DefaultName, "_solving")(0)
+  DefaultName = Split( DefaultName, "_to_solve")(0)
 
 	If (InStr( DefaultName, "20") = 1) Then
 		DefaultNameSplit = Split( DefaultName, "_")
