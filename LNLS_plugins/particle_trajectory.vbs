@@ -132,7 +132,20 @@ Sub ParticleTrajectory()
     Exit Sub
   End If
 
-  Call DrawTrajectory(trajectory)
+  Dim n, i
+  n = Ubound(trajectory)-1
+  Dim x_um, y_um, z_mm
+  ReDim x_um(n)
+  ReDim y_um(n)
+  ReDim z_mm(n)
+  For i = 0 To n
+    x_um(i) = trajectory(i)(0)*1e6
+    y_um(i) = trajectory(i)(1)*1e6
+    z_mm(i) = trajectory(i)(2)*1e3
+  Next
+
+  Call Plot(z_mm, x_um, "Horizontal Trajectory", "z (mm)", "x (um)")
+  Call Plot(z_mm, y_um, "Vertical Trajectory", "z (mm)", "y (um)")
 
   Call SaveTrajectory(trajectory, FullFilename)
   MsgBox("Trajectory saved in file: " & vbCrlf & vbCrlf & FileName)

@@ -325,6 +325,7 @@ Sub Plot(x, y, title, xlabel, ylabel)
 	Dim data
 	ReDim data(npts, 1)
 
+  Dim i
 	For i = 0 To npts
 			data(i, 0) = x(i)
 			data(i, 1) = y(i)
@@ -339,6 +340,7 @@ Sub Plot(x, y, title, xlabel, ylabel)
 
 	Call getDocument().getChartManager().newChart(chartname)
 
+  Dim chart
 	Set chart = getDocument().getChartManager().getChart(chartname)
 
 	Call chart.setTitle(title)
@@ -348,6 +350,7 @@ Sub Plot(x, y, title, xlabel, ylabel)
 
 	Call chart.newCurve(curvename)
 
+  Dim curve
 	Set curve = chart.getCurve(curvename)
 
 	Call curve.setData(data)
