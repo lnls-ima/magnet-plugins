@@ -6,7 +6,6 @@ Dim EmptyVar
 
 Call FieldSampler()
 
-
 Sub FieldSampler()
 
 	Set objFSO = CreateObject("Scripting.FileSystemObject")
@@ -36,6 +35,52 @@ Sub FieldSampler()
 	nproblem = GetProblemNumber(Doc, "Field sampling")
 	If isNull(nproblem) Then Exit Sub End If
 	If not isNumeric(nproblem) Then Exit Sub End If
+
+	Transient = Doc.getSolution().isTransient()
+	If Transient Then
+		Call Doc.getFieldSolutionTimeInstants(nproblem, TimeInstants)
+
+		UserInput = InputBox("Time instant (ms)", BoxTitle, "All")
+		If (Len( UserInput ) = 0) Then Exit Sub End If
+
+		If (StrComp(UserInput, "all", 1) = 0) Then
+			instants = TimeInstants
+		Else
+			ReDim instants(0)
+			instants(0) =  CDbl(UserInput)
+		End If
+
+	Else
+		ReDim instants(0)
+		instants(0) =  0
+	End If
+
+	Dim BoxTitle
+	BoxTitle = "Field sampling - Problem " & CStr( nproblem )
+
+	Range = GetVariableRange("X coordinate (mm)", BoxTitle, "0 10 1", XRange_FromFile)
+	If isNull(Range) Then Exit Sub End If
+	xmin    = Range(0)
+	xmax    = Range(1)
+	xpoints = Range(2)
+	xstep   = Range(3)
+
+	Range = GetVariableRange("Y coordinate (mm)", BoxTitle, "0 10 1", YRange_FromFile)
+	If isNull(Range) Then Exit Sub End If
+	ymin    = Range(0)
+	ymax    = Range(1)
+	ypoints = Range(2)
+	ystep   = Range(3)
+
+	Range = GetVariableRange("Z coordinate (mm)", BoxTitle, "0 10 1", ZRange_FromFile)
+	If isNull(Range) Then Exit Sub End If
+	zmin    = Range(0)
+	zmax    = Range(1)
+	zpoints = Range(2)
+	zstep   = Range(3)
+
+	Smoothed = GetVariableValue("Smoothed field:" & vbCrlf & "0 - No" & vbCrlf & "1 - Yes", BoxTitle, "0", EmptyVar)
+	If isNull(Smoothed) Then Exit Sub End If
 
 	CoilInfo = GetCoilInfo(Doc, nproblem, "main")
 	If not isNull(CoilInfo) Then
@@ -67,30 +112,6 @@ Sub FieldSampler()
 		QSCoilTurns = CoilInfo(1)
 	End If
 
-	Dim BoxTitle
-	BoxTitle = "Field sampling - Problem " & CStr( nproblem )
-
-	Range = GetVariableRange("X coordinate (mm)", BoxTitle, "0 10 1", XRange_FromFile)
-	If isNull(Range) Then Exit Sub End If
-	xmin    = Range(0)
-	xmax    = Range(1)
-	xpoints = Range(2)
-	xstep   = Range(3)
-
-	Range = GetVariableRange("Y coordinate (mm)", BoxTitle, "0 10 1", YRange_FromFile)
-	If isNull(Range) Then Exit Sub End If
-	ymin    = Range(0)
-	ymax    = Range(1)
-	ypoints = Range(2)
-	ystep   = Range(3)
-
-	Range = GetVariableRange("Z coordinate (mm)", BoxTitle, "0 10 1", ZRange_FromFile)
-	If isNull(Range) Then Exit Sub End If
-	zmin    = Range(0)
-	zmax    = Range(1)
-	zpoints = Range(2)
-	zstep   = Range(3)
-
 	DefaultName = ProcessDocumentName(DocumentName)
 
 	If (xpoints <> 1) Then DefaultName = DefaultName & "_X=" & CStr( xmin ) & "_" & CStr( xmax ) & "mm" End If
@@ -103,15 +124,6 @@ Sub FieldSampler()
 	If not IsEmpty( CVCoilCurrent ) Then DefaultName = DefaultName & "_Icv=" & CStr( CVCoilCurrent ) & "A" End If
 	If not IsEmpty( QSCoilCurrent ) Then DefaultName = DefaultName & "_Iqs=" & CStr( QSCoilCurrent ) & "A" End If
 
-	Smoothed = GetVariableValue("Smoothed field:" & vbCrlf & "0 - No" & vbCrlf & "1 - Yes", BoxTitle, "0", EmptyVar)
-	If isNull(Smoothed) Then Exit Sub End If
-
-	If Smoothed Then
-		DefaultName = DefaultName & "_smoothed"
-	End If
-
-	DefaultName = DefaultName & ".txt"
-
 	SplitName = Split( DefaultName, "_")
 	MagnetName = SplitName(1)
 	If (Ubound(SplitName) > 1) Then
@@ -120,95 +132,132 @@ Sub FieldSampler()
 		Model = ""
 	End If
 
-	Filename = GetVariableString("Enter the file name:", BoxTitle, DefaultName, EmptyVar)
-	If isNull(Filename) Then Exit Sub End If
+	DefaultNameBeforeLoop = DefaultName
 
-	FullFilename = objFSO.BuildPath(FilePath, Filename)
+	For tidx=0 to Ubound(instants)
+		instant = instants(tidx)
 
-	Set objFile = objFSO.CreateTextFile(FullFilename, True)
+		If Transient Then
+			DefaultName = DefaultNameBeforeLoop & "_t=" & Cstr(instant) & "ms"
+		Else
+			DefaultName = DefaultNameBeforeLoop
+		End If
 
-	Set Mesh = Doc.getSolution.getMesh( nproblem )
+		If Smoothed Then
+			DefaultName = DefaultName & "_smoothed"
+		End If
 
-	If Smoothed Then
-		Bxname = "B x smoothed"
-		Byname = "B y smoothed"
-		Bzname = "B z smoothed"
-	Else
-		Bxname = "B x"
-		Byname = "B y"
-		Bzname = "B z"
-	End If
+		DefaultName = DefaultName & ".txt"
 
-	Set Field1 = Doc.getSolution.getSystemField (Mesh, Bxname)
-	Set Field2 = Doc.getSolution.getSystemField (Mesh, Byname)
-	Set Field3 = Doc.getSolution.getSystemField (Mesh, Bzname)
+		If Ubound(instants) <> 0 Then
+			Filename = DefaultName
+		Else
+			Filename = GetVariableString("Enter the file name:", BoxTitle, DefaultName, EmptyVar)
+			If isNull(Filename) Then Exit Sub End If
+		End If
 
-	MagNetFile = Split( DocumentName, ".mn")(0) & ".mn"
+		FullFilename = objFSO.BuildPath(FilePath, Filename)
 
-	objFile.Write "fieldmap_name:     " & vbTab & MagnetName & " " & Model & vbCrlf
-	objFile.Write "timestamp:         " & vbTab & GetDate() & "_" & GetTime() & vbCrlf
-	objFile.Write "filename:          " & vbTab & Filename & vbCrlf
-	objFile.Write "MagNet_file:       " & vbTab & MagNetFile & vbCrlf
-	objFile.Write "nr_magnets:        " & vbTab & CStr( 1 ) & vbCrlf
-	objFile.Write vbCrlf
-	objFile.Write "magnet_name:       " & vbTab & MagnetName & vbCrlf
-	objFile.Write "gap[mm]:           " & vbTab & vbCrlf
-	objFile.Write "control_gap[mm]:   " & vbTab & "--" & vbCrlf
-	objFile.Write "magnet_length[mm]: " & vbTab & vbCrlf
+		Set objFile = objFSO.CreateTextFile(FullFilename, True)
 
-	If not IsEmpty( MainCoilCurrent ) Then
-		objFile.Write "current_main[A]:   " & vbTab & CStr( MainCoilCurrent ) & vbCrlf
-		objFile.Write "NI_main[A.esp]:    " & vbTab & CStr( MainCoilCurrent*MainCoilTurns) & vbCrlf
-	Else
-		objFile.Write "current_main[A]:   " & vbTab & "--" & vbCrlf
-		objFile.Write "NI_main[A.esp]:    " & vbTab & "--" & vbCrlf
-	End If
+		If Transient Then
+			Dim ArrayOfValues
+			ReDim ArrayOfValues(1)
+			ArrayOfValues(0) = nproblem
+			ArrayOfValues(1) = instant
+			Set Mesh = Doc.getSolution.getMesh( ArrayOfValues )
+		Else
+			Set Mesh = Doc.getSolution.getMesh( nproblem )
+		End If
 
-	If not IsEmpty( TrimCoilCurrent ) Then
-		objFile.Write "current_trim[A]:   " & vbTab & CStr( TrimCoilCurrent ) & vbCrlf
-		objFile.Write "NI_trim[A.esp]:    " & vbTab & CStr( TrimCoilCurrent*TrimCoilTurns) & vbCrlf
-	End If
+		If Smoothed Then
+			Bxname = "B x smoothed"
+			Byname = "B y smoothed"
+			Bzname = "B z smoothed"
+		Else
+			Bxname = "B x"
+			Byname = "B y"
+			Bzname = "B z"
+		End If
 
-	If not IsEmpty( CHCoilCurrent ) Then
-		objFile.Write "current_ch[A]:     " & vbTab & CStr( CHCoilCurrent ) & vbCrlf
-		objFile.Write "NI_ch[A.esp]:      " & vbTab & CStr( CHCoilCurrent*CHCoilTurns ) & vbCrlf
-	End If
+		Set Field1 = Doc.getSolution.getSystemField (Mesh, Bxname)
+		Set Field2 = Doc.getSolution.getSystemField (Mesh, Byname)
+		Set Field3 = Doc.getSolution.getSystemField (Mesh, Bzname)
 
-	If not IsEmpty( CVCoilCurrent ) Then
-		objFile.Write "current_cv[A]:     " & vbTab & CStr( CVCoilCurrent ) & vbCrlf
-		objFile.Write "NI_cv[A.esp]:      " & vbTab & CStr( CVCoilCurrent*CVCoilTurns ) & vbCrlf
-	End If
+		MagNetFile = Split( DocumentName, ".mn")(0) & ".mn"
 
-	If not IsEmpty( QSCoilCurrent ) Then
-		objFile.Write "current_qs[A]:     " & vbTab & CStr( QSCoilCurrent ) & vbCrlf
-		objFile.Write "NI_qs[A.esp]:      " & vbTab & CStr( QSCoilCurrent*QSCoilTurns ) & vbCrlf
-	End If
+		objFile.Write "fieldmap_name:     " & vbTab & MagnetName & " " & Model & vbCrlf
+		objFile.Write "timestamp:         " & vbTab & GetDate() & "_" & GetTime() & vbCrlf
+		objFile.Write "filename:          " & vbTab & Filename & vbCrlf
+		objFile.Write "MagNet_file:       " & vbTab & MagNetFile & vbCrlf
+		objFile.Write "nr_magnets:        " & vbTab & CStr( 1 ) & vbCrlf
+		objFile.Write vbCrlf
+		objFile.Write "magnet_name:       " & vbTab & MagnetName & vbCrlf
+		objFile.Write "gap[mm]:           " & vbTab & vbCrlf
+		objFile.Write "control_gap[mm]:   " & vbTab & "--" & vbCrlf
+		objFile.Write "magnet_length[mm]: " & vbTab & vbCrlf
 
-	objFile.Write "center_pos_z[mm]:  " & vbTab & CStr( 0 ) & vbCrlf
-	objFile.Write "center_pos_x[mm]:  " & vbTab & CStr( 0 ) & vbCrlf
-	objFile.Write "rotation[deg]:     " & vbTab & CStr( 0 ) & vbCrlf
-	objFile.Write vbCrlf
-	objFile.Write "X[mm]" & vbTab & "Y[mm]" & vbTab & "Z[mm]" & vbTab & "Bx" & vbTab & "By" & vbTab & "Bz [T]" & vbCrlf
-	objFile.Write "------------------------------------------------------------------------------------------------------------------------------------------------------------------" & vbCrlf
+		If not IsEmpty( MainCoilCurrent ) Then
+			objFile.Write "current_main[A]:   " & vbTab & CStr( MainCoilCurrent ) & vbCrlf
+			objFile.Write "NI_main[A.esp]:    " & vbTab & CStr( MainCoilCurrent*MainCoilTurns) & vbCrlf
+		Else
+			objFile.Write "current_main[A]:   " & vbTab & "--" & vbCrlf
+			objFile.Write "NI_main[A.esp]:    " & vbTab & "--" & vbCrlf
+		End If
 
-	For k=0 to zpoints-1
-		For j=0 to ypoints-1
-			For i=0 to xpoints-1
-				x = xmin + xstep*i
-				y = ymin + ystep*j
-				z = zmin + zstep*k
-				Call Field1.getFieldAtPoint (x, y, z, bx)
-				Call Field2.getFieldAtPoint (x, y, z, by)
-				Call Field3.getFieldAtPoint (x, y, z, bz)
-				objFile.Write CStr(x) & vbTab & CStr(y) & vbTab & CStr(z) & vbTab & CStr(bx(0)) & vbTab & CStr(by(0)) & vbTab & CStr(bz(0)) & vbCrlf
+		If not IsEmpty( TrimCoilCurrent ) Then
+			objFile.Write "current_trim[A]:   " & vbTab & CStr( TrimCoilCurrent ) & vbCrlf
+			objFile.Write "NI_trim[A.esp]:    " & vbTab & CStr( TrimCoilCurrent*TrimCoilTurns) & vbCrlf
+		End If
+
+		If not IsEmpty( CHCoilCurrent ) Then
+			objFile.Write "current_ch[A]:     " & vbTab & CStr( CHCoilCurrent ) & vbCrlf
+			objFile.Write "NI_ch[A.esp]:      " & vbTab & CStr( CHCoilCurrent*CHCoilTurns ) & vbCrlf
+		End If
+
+		If not IsEmpty( CVCoilCurrent ) Then
+			objFile.Write "current_cv[A]:     " & vbTab & CStr( CVCoilCurrent ) & vbCrlf
+			objFile.Write "NI_cv[A.esp]:      " & vbTab & CStr( CVCoilCurrent*CVCoilTurns ) & vbCrlf
+		End If
+
+		If not IsEmpty( QSCoilCurrent ) Then
+			objFile.Write "current_qs[A]:     " & vbTab & CStr( QSCoilCurrent ) & vbCrlf
+			objFile.Write "NI_qs[A.esp]:      " & vbTab & CStr( QSCoilCurrent*QSCoilTurns ) & vbCrlf
+		End If
+
+		If Transient Then
+			objFile.Write "time_instant[ms]:  " & vbTab & CStr( instant ) & vbCrlf
+		End If
+
+		objFile.Write "center_pos_z[mm]:  " & vbTab & CStr( 0 ) & vbCrlf
+		objFile.Write "center_pos_x[mm]:  " & vbTab & CStr( 0 ) & vbCrlf
+		objFile.Write "rotation[deg]:     " & vbTab & CStr( 0 ) & vbCrlf
+		objFile.Write vbCrlf
+		objFile.Write "X[mm]" & vbTab & "Y[mm]" & vbTab & "Z[mm]" & vbTab & "Bx" & vbTab & "By" & vbTab & "Bz [T]" & vbCrlf
+		objFile.Write "------------------------------------------------------------------------------------------------------------------------------------------------------------------" & vbCrlf
+
+		For k=0 to zpoints-1
+			For j=0 to ypoints-1
+				For i=0 to xpoints-1
+					x = xmin + xstep*i
+					y = ymin + ystep*j
+					z = zmin + zstep*k
+					Call Field1.getFieldAtPoint (x, y, z, bx)
+					Call Field2.getFieldAtPoint (x, y, z, by)
+					Call Field3.getFieldAtPoint (x, y, z, bz)
+					objFile.Write CStr(x) & vbTab & CStr(y) & vbTab & CStr(z) & vbTab & CStr(bx(0)) & vbTab & CStr(by(0)) & vbTab & CStr(bz(0)) & vbCrlf
+				Next
 			Next
 		Next
+
+		objFile.Close
+
 	Next
 
-	objFile.Close
-
+	MsgBox("Fieldmap(s) saved to file(s).")
 
 End Sub
+
 
 Function GetCoilInfo(Doc, nproblem, CoilType)
 	Dim NrCoils
