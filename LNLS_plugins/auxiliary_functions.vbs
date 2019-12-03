@@ -236,6 +236,40 @@ Function GetVariableString(VariableLabel, DialogTitle, DefaultValue, FromFile)
 End Function
 
 
+Function GetVector(VariableLabel, DialogTitle, DefaultValues, FromFile)
+
+  Dim UserInput
+  Dim Vx
+  Dim Vy
+  Dim Vz
+  Dim Vector
+  ReDim Vector(3)
+
+  If FromFile <> "" Then
+		UserInput = FromFile
+	Else
+		UserInput = InputBox( VariableLabel, DialogTitle, DefaultValues)
+	End If
+
+	If (Len( UserInput ) = 0) Then
+		GetVector = Null
+		Exit Function
+	End If
+
+	UserInput = Split(UserInput)
+	Vx = CDbl(UserInput(0))
+	Vy = CDbl(UserInput(1))
+	Vz = CDbl(UserInput(2))
+
+  Vector(0) = Vx
+  Vector(1) = Vy
+  Vector(2) = Vz
+
+  GetVector = Vector
+
+End Function
+
+
 Function GetParametersFromFile(Filename, CommentChar)
 
 	Set objFSO=CreateObject("Scripting.FileSystemObject")
@@ -564,5 +598,29 @@ Function PolynomialFitting( x(), y(), order )
   Next
 
   PolynomialFitting = coeffs
+
+End Function
+
+
+Function TrapzIntegral(x, y)
+  Dim npts
+  npts = Ubound(x)
+
+  If (Ubound(y) <> npts) Then
+    MsgBox("x and y must have the same number of points.")
+    TrapzIntegral = Null
+    Exit Function
+  End If
+
+  Dim dx
+  dx = (x(npts-1) - x(0))/(npts-1)
+
+  Dim sy
+  sy = 0
+  For i=1 To npts-2
+    sy = sy + y(i)
+  Next
+
+  TrapzIntegral = dx*(sy + (y(npts-1) + y(0))/2)
 
 End Function

@@ -62,6 +62,7 @@ Sub Install_Plugins()
   Dim VertexParamPath
   Dim FieldSamplerPath
   Dim FieldMultipolesPath
+  Dim FieldIntegralsPath
   Dim CoilResistancePath
   Dim ParticleTrajectoryPath
   Dim KickMapPath
@@ -70,6 +71,7 @@ Sub Install_Plugins()
   VertexParamPath = objFSO.BuildPath(PluginsInstallationDir, "vertex_parametrization.vbs")
   FieldSamplerPath = objFSO.BuildPath(PluginsInstallationDir, "field_sampler.vbs")
   FieldMultipolesPath = objFSO.BuildPath(PluginsInstallationDir, "field_multipoles.vbs")
+  FieldIntegralsPath = objFSO.BuildPath(PluginsInstallationDir, "field_integrals.vbs")
   CoilResistancePath = objFSO.BuildPath(PluginsInstallationDir, "coil_resistance.vbs")
   ParticleTrajectoryPath = objFSO.BuildPath(PluginsInstallationDir, "particle_trajectory.vbs")
   KickMapPath = objFSO.BuildPath(PluginsInstallationDir, "kick_map.vbs")
@@ -97,6 +99,8 @@ Sub Install_Plugins()
               Chr(9) & "macromenu.appendItem ""Field Sampler"", command" & vbCrLf & vbCrLf & _
               Chr(9) & "command = ""runScript("" & Chr(34) & """ & FieldMultipolesPath & """ & Chr(34) & "")""" & vbCrLf & _
               Chr(9) & "macromenu.appendItem ""Field Multipoles"", command" & vbCrLf & vbCrLf & _
+              Chr(9) & "command = ""runScript("" & Chr(34) & """ & FieldIntegralsPath & """ & Chr(34) & "")""" & vbCrLf & _
+              Chr(9) & "macromenu.appendItem ""Field Integrals"", command" & vbCrLf & vbCrLf & _
               Chr(9) & "command = ""runScript("" & Chr(34) & """ & CoilResistancePath & """ & Chr(34) & "")""" & vbCrLf & _
               Chr(9) & "macromenu.appendItem ""Coil Resistance"", command" & vbCrLf & vbCrLf & _
               Chr(9) & "command = ""runScript("" & Chr(34) & """ & ParticleTrajectoryPath & """ & Chr(34) & "")""" & vbCrLf & _

@@ -1036,6 +1036,47 @@
         <rVal temperature="20">7600</rVal>
      </MassDensityData>
   </Material>
+  <Material id="Vacodym 764AP Br=1.31T">
+     <GeneralAttributes>
+        <Category>Insulator material</Category>
+        <Category>Sleeve material</Category>
+        <Category>Shaft material</Category>
+        <Category>Housing material</Category>
+        <Category>Permanent magnet material</Category>
+        <Description><![CDATA[Br=1.31T]]></Description>
+        <Color rgba="105 28 28 255"/>
+     </GeneralAttributes>
+     <PermeabilityData>
+        <RelativePermeabilityData>
+           <MUrHc temperature="20">
+              <rVal>1.04</rVal>
+              <rVal>-1002370.0743</rVal>
+           </MUrHc>
+        </RelativePermeabilityData>
+        <DemagnetizationData>
+           <rVal temperature="20">-0.573779245</rVal>
+        </DemagnetizationData>
+     </PermeabilityData>
+     <PermittivityData>
+        <RelativePermittivityData>
+           <rVal temperature="20">1</rVal>
+        </RelativePermittivityData>
+     </PermittivityData>
+     <ResistivityData>
+        <AbsoluteResistivityData>
+           <rVal temperature="20">1.6e-06</rVal>
+        </AbsoluteResistivityData>
+     </ResistivityData>
+     <ThermalConductivityData>
+        <rVal temperature="20">10</rVal>
+     </ThermalConductivityData>
+     <SpecificHeatCapacityData>
+        <rVal temperature="20">450</rVal>
+     </SpecificHeatCapacityData>
+     <MassDensityData>
+        <rVal temperature="20">7600</rVal>
+     </MassDensityData>
+  </Material>
   <Material id="Vacodym 764AP Br=1.28T">
      <GeneralAttributes>
         <Category>Insulator material</Category>
